@@ -6,7 +6,7 @@ import cors from 'cors'
 // overridden when starting the server. For example:
 //
 //   PORT=9000 npm start
-const port = process.env.PORT || 9800
+const port = process.env.PORT || 1800
 const app = express()
 
 const dotenv = require('dotenv')
