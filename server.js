@@ -60,13 +60,13 @@ app.post('/webhook', bodyParser.raw({type: 'application/json'}), (request, respo
   // Handle the event
   switch (event.type) {
     case 'room.client.joined':
-      const userJoined = event.data.object;
+      const userJoined = event.data;
       console.log("user joined?", userJoined)
       // Then define and call a method to handle a user joined.
       // handleuserJoined(userJoined);
       break;
     case 'room.client.left':
-      const userLeft = event.data.object;
+      const userLeft = event.data;
       console.log("user left?", userLeft)
       // Then define and call a method to handle the successful attachment of a PaymentMethod.
       // 
