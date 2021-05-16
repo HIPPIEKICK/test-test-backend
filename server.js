@@ -56,7 +56,7 @@ app.post('/webhook', bodyParser.raw({type: 'application/json'}), async (req, res
   // Handle the event
   if (event.type === 'room.client.joined') {
     console.log("user joined: ", event.data)
-    const room = await Room.findOne(roomName)
+    const room = await Room.findOne({roomName})
     console.log(room)
   } else if (event.type === 'room.client.left') {
     console.log("user left: ", event.data)
