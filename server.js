@@ -47,29 +47,39 @@ app.get('/', (req, res) => {
   res.send('Hello world')
 })
 
-const fetch = require("node-fetch");
-
 // Match the raw body to content type application/json
 app.post('/webhook', bodyParser.raw({type: 'application/json'}), async (req, res) => {
-  const event = req.body;
+  const event = req.body
 
   // Handle the event
   if (event.type === 'room.client.joined') {
     console.log("user joined: ", event.data)
     const room = await Room.findOne({ roomName: event.data.roomName})
     if (room) {
-      console.log(room)
+      await Room.findOneAndUpdate(
+        { roomName: room.roomName },
+        { numClients: room.numClients }
+      )
     } else {
       console.log("no room found")
     }
   } else if (event.type === 'room.client.left') {
     console.log("user left: ", event.data)
+    const room = await Room.findOne({ roomName: event.data.roomName})
+    if (room) {
+      await Room.findOneAndUpdate(
+        { roomName: room.roomName },
+        { numClients: room.numClients }
+      )
+    } else {
+      console.log("no room found")
+    }
   } else {
     console.log(`Unhandled event type ${event.type}`)
   }
 
   // Return a response to acknowledge receipt of the event
-  res.json({received: true});
+  res.json({received: true})
 });
 
 app.get("/rooms", async (req, res) => {
