@@ -49,8 +49,8 @@ getResponse().then(async res => {
     console.log("Status code:", res.status);
     const data = await res.json();
     console.log("Room URL:", data.roomUrl);
-    console.log("Host room URL:", data.hostRoomUrl);
-    console.log("Data:", data)
+    // console.log("Host room URL:", data.hostRoomUrl);
+    // console.log("Data:", data)
 });
 
 // Match the raw body to content type application/json
@@ -61,11 +61,13 @@ app.post('/webhook', bodyParser.raw({type: 'application/json'}), (request, respo
   switch (event.type) {
     case 'room.client.joined':
       const userJoined = event.data.object;
+      console.log("user joined?", userJoined)
       // Then define and call a method to handle a user joined.
       // handleuserJoined(userJoined);
       break;
     case 'room.client.left':
       const userLeft = event.data.object;
+      console.log("user left?", userLeft)
       // Then define and call a method to handle the successful attachment of a PaymentMethod.
       // 
       break;
