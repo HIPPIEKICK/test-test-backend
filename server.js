@@ -23,7 +23,7 @@ if (process.env.RESET_DB) {
 }
 
 const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/rooms"
-mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true, useFindAndModify: false })
 mongoose.Promise = Promise
 
 
@@ -90,6 +90,10 @@ app.get("/rooms", async (req, res) => {
     res.status(404).json({ error: "rooms not found" })
   }
 })
+
+app.get("/rooms/:roomName"), (req, res) => {
+
+}
 
 // Start the server
 app.listen(port, () => {
