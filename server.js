@@ -50,6 +50,32 @@ getResponse().then(async res => {
     const data = await res.json();
     console.log("Room URL:", data.roomUrl);
     console.log("Host room URL:", data.hostRoomUrl);
+    console.log("Data:", data)
+});
+
+// Match the raw body to content type application/json
+app.post('/webhook', bodyParser.raw({type: 'application/json'}), (request, response) => {
+  const event = request.body;
+
+  // Handle the event
+  switch (event.type) {
+    case 'room.client.joined':
+      const userJoined = event.data.object;
+      // Then define and call a method to handle a user joined.
+      // handleuserJoined(userJoined);
+      break;
+    case 'room.client.left':
+      const userLeft = event.data.object;
+      // Then define and call a method to handle the successful attachment of a PaymentMethod.
+      // 
+      break;
+    // ... handle other event types
+    default:
+      console.log(`Unhandled event type ${event.type}`);
+  }
+
+  // Return a response to acknowledge receipt of the event
+  response.json({received: true});
 });
 
 // Start the server
