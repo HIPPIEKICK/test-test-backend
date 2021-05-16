@@ -1,6 +1,32 @@
 import express from 'express'
 import bodyParser from 'body-parser'
 import cors from 'cors'
+import mongoose from 'mongoose'
+
+import data from "./rooms.json"
+
+const Room = mongoose.model("Room", {
+  id: Number,
+  roomName: String,
+  numClients: Number,
+  // url: String
+})
+
+if (process.env.RESET_DB) {
+  const seedDatabase = async () => {
+    await Room.deleteMany({})
+    data.forEach((room) => {
+      new Room(room).save()
+    })
+  }
+  seedDatabase()
+}
+
+const mongoUrl = process.env.MONGO_URL || "mongodb://localhost/rooms"
+mongoose.connect(mongoUrl, { useNewUrlParser: true, useUnifiedTopology: true })
+mongoose.Promise = Promise
+
+
 
 // Defines the port the app will run on. Defaults to 8080, but can be 
 // overridden when starting the server. For example:
@@ -23,62 +49,33 @@ app.get('/', (req, res) => {
 
 const fetch = require("node-fetch");
 
-// const API_KEY = "YOUR_API_KEY";
-// console.log(new Date(Date.now()))
-const data = {
-  isLocked: true,
-  roomNamePrefix: "/matilda",
-  roomNamePattern: "human-short",
-  startDate: new Date(Date.now()),
-  endDate: "3022-05-15T13:56:00.000Z",
-  fields: ["hostRoomUrl"],
-};
-
-function getResponse() {
-    return fetch("https://api.whereby.dev/v1/meetings", {
-        method: "POST",
-        headers: {
-            Authorization: `Bearer ${process.env.API_KEY}`,
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-    });
-}
-
-getResponse().then(async res => {
-    console.log("Status code:", res.status);
-    const data = await res.json();
-    console.log("Room URL:", data.roomUrl);
-    // console.log("Host room URL:", data.hostRoomUrl);
-    // console.log("Data:", data)
-});
-
 // Match the raw body to content type application/json
-app.post('/webhook', bodyParser.raw({type: 'application/json'}), (request, response) => {
-  const event = request.body;
+app.post('/webhook', bodyParser.raw({type: 'application/json'}), async (req, res) => {
+  const event = req.body;
 
   // Handle the event
-  switch (event.type) {
-    case 'room.client.joined':
-      const userJoined = event.data;
-      console.log("user joined?", userJoined)
-      // Then define and call a method to handle a user joined.
-      // handleuserJoined(userJoined);
-      break;
-    case 'room.client.left':
-      const userLeft = event.data;
-      console.log("user left?", userLeft)
-      // Then define and call a method to handle the successful attachment of a PaymentMethod.
-      // 
-      break;
-    // ... handle other event types
-    default:
-      console.log(`Unhandled event type ${event.type}`);
+  if (event.type === 'room.client.joined') {
+    console.log("user joined: ", event.data)
+    const room = await Room.findOne(roomName)
+    console.log(room)
+  } else if (event.type === 'room.client.left') {
+    console.log("user left: ", event.data)
+  } else {
+    console.log(`Unhandled event type ${event.type}`)
   }
 
   // Return a response to acknowledge receipt of the event
-  response.json({received: true});
+  res.json({received: true});
 });
+
+app.get("/rooms", async (req, res) => {
+  const rooms = await Room.find()
+  if (rooms) {
+    res.json(rooms)
+  } else {
+    res.status(404).json({ error: "rooms not found" })
+  }
+})
 
 // Start the server
 app.listen(port, () => {
