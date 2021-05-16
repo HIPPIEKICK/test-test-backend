@@ -69,7 +69,7 @@ app.post('/webhook', bodyParser.raw({type: 'application/json'}), async (req, res
     if (room) {
       await Room.findOneAndUpdate(
         { roomName: room.roomName },
-        { numClients: room.numClients }
+        { numClients: event.data.numClients }
       )
     } else {
       console.log("no room found")
