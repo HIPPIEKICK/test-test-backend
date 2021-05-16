@@ -91,9 +91,15 @@ app.get("/rooms", async (req, res) => {
   }
 })
 
-app.get("/rooms/:roomName"), (req, res) => {
-
-}
+app.get("/rooms/:id", async (req, res) => {
+  const id = req.params.id
+  const room = await Room.findOne({ id: id })
+  if (room) {
+    res.json(room)
+  } else {
+    res.status(404).json({ error: "room not found" })
+  }
+})
 
 // Start the server
 app.listen(port, () => {
